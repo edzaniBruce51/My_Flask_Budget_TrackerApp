@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+
+{% block title %}Budgets - Budget Tracker{% endblock %}
+
+{% block content %}
+<style>
+    .budget-container {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        margin: 2rem auto;
+        max-width: 1200px;
+    }
+
+    .header-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding: 0 1rem;
+    }
+
+    .page-title {
+        font-size: 2.5rem;
+        color: #2d3748;
+        font-weight: 700;
+    }
+
+    .budget-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 1rem;
+    }
+
+    .budget-table th {
+        text-align: left;
+        padding: 0.5rem 1rem;
+        color: #4a5568;
+        font-weight: 600;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .budget-table td {
+        padding: 1rem;
+        background-color: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .budget-table tr td:first-child {
+        border-top-left-radius: 8px;
+        border-bottom-left-radius: 8px;
+    }
+
+    .budget-table tr td:last-child {
+        border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
+    }
+
+    .progress-container {
+        width: 100%;
+        height: 8px;
+        background-color: #e2e8f0;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background-color: #4f46e5;
+    }
+
+    .progress-bar.warning {
+        background-color: #f59e0b;
+    }
+
+    .progress-bar.danger {
+        background-color: #ef4444;
+    }
+
+    .empty-message {
+        text-align: center;
+        padding: 2rem;
+        color: #718096;
+        font-size: 1.1rem;
+    }
+</style>
+
+<div class="budget-container">
+    <div class="header-section">
+        <h1 class="page-title">My Budgets</h1>
+        <a href="{{ url_for('budget_create') }}" class="add-button">Add Budget</a>
+    </div>
+
+    {% if budgets %}
+        <div style="overflow-x: auto;">
+            <table class="budget-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Period</th>
+                        <th>Amount</th>
+                        <th>Spent</th>
+                        <th>Progress</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for budget in budgets %}
+                        {% set percentage = budget.get_percentage_used() %}
+                        {% set progress_class = '' %}
+                        {% if percentage > 90 %}
+                            {% set progress_class = 'danger' %}
+                        {% elif percentage > 75 %}
+                            {% set progress_class = 'warning' %}
+                        {% endif %}
+                        
+                        <tr>
+                            <td>{{ budget.name }}</td>
+                            <td>{{ budget.category.name }}</td>
+                            <td>{{ budget.start_date.strftime('%b %d') }} - {{ budget.end_date.strftime('%b %d, %Y') }}</td>
+                            <td>R{{ "%.2f"|format(budget.amount) }}</td>
+                            <td>R{{ "%.2f"|format(budget.get_spent_amount()) }}</td>
+                            <td>
+                                <div class="progress-container">
+                                    <div class="progress-bar {{ progress_class }}" style="width: {{ percentage }}%"></div>
+                                </div>
+                                <small>{{ "%.1f"|format(percentage) }}%</small>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('budget_edit', budget_id=budget.id) }}" class="action-link edit-link">Edit</a>
+                                <a href="{{ url_for('budget_delete', budget_id=budget.id) }}" class="action-link delete-link">Delete</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="empty-message">No budgets found. Add your first budget!</p>
+    {% endif %}
+</div>
+{% endblock %}

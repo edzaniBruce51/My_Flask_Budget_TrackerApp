@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Categories - Budget Tracker{% endblock %}
+
+{% block content %}
+<style>
+    .category-container {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        margin: 2rem auto;
+        max-width: 1200px;
+    }
+
+    .header-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding: 0 1rem;
+    }
+
+    .page-title {
+        font-size: 2.5rem;
+        color: #2d3748;
+        font-weight: 700;
+    }
+
+    .category-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 1rem;
+    }
+
+    .category-table th {
+        text-align: left;
+        padding: 0.5rem 1rem;
+        color: #4a5568;
+        font-weight: 600;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .category-table td {
+        padding: 1rem;
+        background-color: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .category-table tr td:first-child {
+        border-top-left-radius: 8px;
+        border-bottom-left-radius: 8px;
+    }
+
+    .category-table tr td:last-child {
+        border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
+    }
+
+    .empty-message {
+        text-align: center;
+        padding: 2rem;
+        color: #718096;
+        font-size: 1.1rem;
+    }
+</style>
+
+<div class="category-container">
+    <div class="header-section">
+        <h1 class="page-title">My Categories</h1>
+        <a href="{{ url_for('category_create') }}" class="add-button">Add Category</a>
+    </div>
+
+    {% if categories %}
+        <div style="overflow-x: auto;">
+            <table class="category-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Total Expenses</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for category in categories %}
+                        <tr>
+                            <td>{{ category.name }}</td>
+                            <td>{{ category.description }}</td>
+                            <td>R{{ "%.2f"|format(category.get_total_expenses()) }}</td>
+                            <td>
+                                <a href="{{ url_for('category_edit', category_id=category.id) }}" class="action-link edit-link">Edit</a>
+                                <a href="{{ url_for('category_delete', category_id=category.id) }}" class="action-link delete-link">Delete</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="empty-message">No categories found. Add your first category!</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Expense - Budget Tracker{% endblock %}
+
+{% block content %}
+<div class="page-container" style="max-width: 500px;">
+    <h1 class="page-title">Delete Expense</h1>
+    
+    <p style="margin-bottom: 2rem;">Are you sure you want to delete the expense "{{ expense.description }}" for R{{ "%.2f"|format(expense.amount) }}?</p>
+    
+    <form method="post">
+        <div style="display: flex; justify-content: space-between;">
+            <a href="{{ url_for('expense_list') }}" class="action-link edit-link">
+                Cancel
+            </a>
+            <button type="submit" class="action-link delete-link" style="border: none; cursor: pointer;">
+                Delete
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

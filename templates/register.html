@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - Budget Tracker{% endblock %}
+
+{% block content %}
+<style>
+    .register-container {
+        max-width: 400px;
+        margin: 2rem auto;
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .register-title {
+        text-align: center;
+        margin-bottom: 2rem;
+        color: #2d3748;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        font-size: 1rem;
+    }
+    
+    .register-button {
+        width: 100%;
+        background-color: #4f46e5;
+        color: white;
+        padding: 0.75rem;
+        border: none;
+        border-radius: 6px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    
+    .register-button:hover {
+        background-color: #4338ca;
+    }
+    
+    .login-link {
+        text-align: center;
+        margin-top: 1.5rem;
+    }
+</style>
+
+<div class="register-container">
+    <h1 class="register-title">Create an Account</h1>
+    
+    <form method="post">
+        {{ form.hidden_tag() }}
+        
+        <div class="form-group">
+            <label for="{{ form.username.id }}" class="form-label">Username</label>
+            {{ form.username(class="form-control") }}
+            {% if form.username.errors %}
+                <div class="error-message">
+                    {% for error in form.username.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.password.id }}" class="form-label">Password</label>
+            {{ form.password(class="form-control") }}
+            {% if form.password.errors %}
+                <div class="error-message">
+                    {% for error in form.password.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.confirm_password.id }}" class="form-label">Confirm Password</label>
+            {{ form.confirm_password(class="form-control") }}
+            {% if form.confirm_password.errors %}
+                <div class="error-message">
+                    {% for error in form.confirm_password.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <button type="submit" class="register-button">Register</button>
+    </form>
+    
+    <div class="login-link">
+        <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Budget Tracker{% endblock %}</title>
+    <style>
+        /* Basic CSS styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        nav {
+            background-color: #4f46e5;
+            color: white;
+            padding: 1rem;
+        }
+
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            margin: 0 0.25rem;
+        }
+
+        nav a:hover {
+            background-color: #4338ca;
+            border-radius: 4px;
+        }
+
+        .nav-brand {
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        /* Shared Components */
+        .page-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin: 2rem auto;
+            max-width: 1200px;
+        }
+
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 0 1rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            color: #2d3748;
+            font-weight: 700;
+        }
+
+        .add-button {
+            background-color: #4f46e5;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .add-button:hover {
+            background-color: #4338ca;
+        }
+
+        /* Data Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 1rem;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 0.5rem 1rem;
+            color: #4a5568;
+            font-weight: 600;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .data-table td {
+            padding: 1rem;
+            background-color: white;
+        }
+
+        .data-table tr td:first-child {
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+        }
+
+        .data-table tr td:last-child {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+
+        /* Forms */
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .form input, .form select, .form textarea {
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .form textarea {
+            min-height: 100px;
+        }
+
+        .error-message {
+            color: #e53e3e;
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        /* Messages */
+        .message {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 6px;
+        }
+
+        .message-success {
+            background-color: #c6f6d5;
+            color: #2f855a;
+        }
+
+        .message-error {
+            background-color: #fed7d7;
+            color: #c53030;
+        }
+
+        /* Empty state */
+        .empty-message {
+            text-align: center;
+            padding: 2rem;
+            color: #718096;
+            font-size: 1.1rem;
+        }
+
+        /* Action links */
+        .action-link {
+            padding: 0.5rem 0.75rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            margin-right: 0.5rem;
+        }
+
+        .edit-link {
+            background-color: #ebf4ff;
+            color: #3182ce;
+        }
+
+        .delete-link {
+            background-color: #fff5f5;
+            color: #e53e3e;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <div class="nav-links">
+                <a href="{{ url_for('dashboard') }}" class="nav-brand">Finance Manager</a>
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('expense_list') }}">Expenses</a>
+                <a href="{{ url_for('budget_list') }}">Budgets</a>
+                <a href="{{ url_for('category_list') }}">Categories</a>
+                {% endif %}
+            </div>
+            <div class="nav-links">
+                {% if current_user.is_authenticated %}
+                    <span style="margin-right: 1rem;">{{ current_user.username }}</span>
+                    <a href="{{ url_for('logout') }}">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}">Login</a>
+                    <a href="{{ url_for('register') }}">Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="message {% if category == 'success' %}message-success{% else %}message-error{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

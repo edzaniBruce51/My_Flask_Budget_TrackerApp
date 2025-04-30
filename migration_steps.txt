@@ -1,0 +1,89 @@
+DJANGO TO FLASK MIGRATION - SIMPLE GUIDE
+==========================================
+
+This document explains how we migrated the Finance Tracker app from Django to Flask in simple terms.
+
+WHAT WE DID
+-----------
+
+1. REPLACED DEPENDENCIES
+   - Removed Django packages
+   - Added Flask packages (flask, flask-sqlalchemy, flask-login, flask-wtf)
+
+2. CREATED BASIC FLASK FILES
+   - app.py: The main file that starts the application
+   - models.py: Contains database tables definitions
+   - forms.py: Contains form definitions for user input
+   - routes.py: Contains all the website paths/URLs
+
+3. CONVERTED DATABASE MODELS
+   - Changed Django models to SQLAlchemy models
+   - Kept the same tables: User, Category, Budget, Expense
+   - Kept the same relationships between tables
+
+4. CONVERTED USER LOGIN SYSTEM
+   - Switched from Django's built-in auth to Flask-Login
+   - Created login, logout, and registration pages
+
+5. CONVERTED TEMPLATES
+   - Moved templates from Django syntax to Jinja2 (Flask's template system)
+   - Kept the same look and feel
+   - Updated template tags ({% url %} to {{ url_for() }}, etc.)
+
+6. KEPT STATIC FILES
+   - Kept the same JavaScript for charts
+   - Kept the same CSS styles
+
+7. CREATED DATABASE SETUP
+   - Added init_db.py to initialize the database
+   - Added sample data for testing
+
+8. REMOVED DEPLOYMENT CODE
+   - Removed code specific to production deployment
+   - Removed Django admin interface
+
+HOW TO RUN THE NEW APP
+----------------------
+
+1. Install required packages:
+   pip install -r requirements.txt
+
+2. Initialize the database:
+   python init_db.py
+
+3. Start the application:
+   python app.py
+
+4. Open your browser and go to:
+   http://localhost:5000
+
+5. Login with demo account:
+   Username: demo
+   Password: demo123
+
+WHAT'S DIFFERENT NOW
+--------------------
+
+1. SIMPLER STRUCTURE
+   - Fewer files to manage
+   - More straightforward organization
+
+2. NO ADMIN INTERFACE
+   - Removed Django's built-in admin site
+   - Focus on user-facing features only
+
+3. DIFFERENT DATABASE ACCESS
+   - Using SQLAlchemy instead of Django ORM
+   - Same data, different way to access it
+
+4. EASIER LOCAL DEVELOPMENT
+   - No need to run migrations
+   - Simpler to start and stop the application
+
+The application works the same way as before - you can still:
+- Track expenses
+- Manage budgets
+- View spending by category
+- See charts and reports
+
+All user data works exactly the same, just with Flask handling things behind the scenes instead of Django.
