@@ -203,7 +203,20 @@
             color: #e53e3e;
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <!-- Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+
+    <!-- Verify Chart.js is loaded -->
+    <script>
+        window.addEventListener('load', function() {
+            if (typeof Chart === 'undefined') {
+                console.error('ERROR: Chart.js failed to load!');
+                alert('ERROR: Chart.js library failed to load. Charts will not display correctly.');
+            } else {
+                console.log('Chart.js loaded successfully. Version:', Chart.version);
+            }
+        });
+    </script>
     {% block extra_js %}{% endblock %}
 </head>
 <body>
