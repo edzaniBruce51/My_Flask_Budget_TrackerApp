@@ -156,7 +156,8 @@ document.addEventListener('DOMContentLoaded', function() {
                             data: amounts,
                             borderColor: '#4F46E5',
                             tension: 0.1,
-                            fill: false
+                            fill: false,
+                            spanGaps: true // This will connect points even with missing data
                         }]
                     },
                     options: {
@@ -165,6 +166,16 @@ document.addEventListener('DOMContentLoaded', function() {
                         scales: {
                             y: {
                                 beginAtZero: true
+                            },
+                            x: {
+                                type: 'time',
+                                time: {
+                                    parser: 'YYYY-MM-DD',
+                                    unit: 'day',
+                                    displayFormats: {
+                                        day: 'MMM dd'
+                                    }
+                                }
                             }
                         }
                     }
