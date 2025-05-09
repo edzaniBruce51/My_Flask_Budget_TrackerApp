@@ -106,7 +106,10 @@
                         <tr>
                             <td>{{ expense.date.strftime('%b %d, %Y') }}</td>
                             <td>{{ expense.description }}</td>
-                            <td>{{ expense.category.name }}</td>
+                            <td>
+                                {% set category = Category.query.get(expense.category_id) %}
+                                {{ category.name if category else 'Unknown' }}
+                            </td>
                             <td>R{{ "%.2f"|format(expense.amount) }}</td>
                             <td>
                                 <a href="{{ url_for('expense_edit', expense_id=expense.id) }}" class="action-link edit-link">Edit</a>
@@ -122,3 +125,4 @@
     {% endif %}
 </div>
 {% endblock %}
+
