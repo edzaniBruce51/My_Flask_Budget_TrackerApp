@@ -107,9 +107,22 @@ def dashboard():
         Expense.date >= thirty_days_ago,
         Expense.date <= today
     ).group_by(Expense.date).order_by(Expense.date).all()
-    
-    trend_dates = [item[0].strftime('%Y-%m-%d') for item in expense_trend]
-    trend_amounts = [float(item[1]) for item in expense_trend]
+
+    # Create a complete date range for the last 30 days
+    trend_dates = []
+    trend_amounts = []
+    current_date = thirty_days_ago
+    while current_date <= today:
+        date_str = current_date.strftime('%Y-%m-%d')
+        # Find if we have data for this date
+        amount = 0
+        for date, total in expense_trend:
+            if date.strftime('%Y-%m-%d') == date_str:
+                amount = float(total)
+                break
+        trend_dates.append(date_str)
+        trend_amounts.append(amount)
+        current_date += timedelta(days=1)
     
     return render_template(
         'dashboard.html',
@@ -358,6 +371,8 @@ def category_delete(category_id):
         return redirect(url_for('category_list'))
     
     return render_template('category_confirm_delete.html', category=category)
+
+
 
 
 
