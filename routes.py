@@ -52,13 +52,13 @@ def register():
 def dashboard():
     # Get current month's date range
     today = datetime.now()
-    month_start = today.replace(day=1)
-    month_end = (month_start + timedelta(days=32)).replace(day=1) - timedelta(days=1)
+    month_start = today.replace(day=1)  # First day of current month
+    month_end = (month_start + timedelta(days=32)).replace(day=1) - timedelta(days=1)  # Last day of current month
     
     # Get last 30 days for trend chart
     thirty_days_ago = today - timedelta(days=30)
     
-    # Get monthly expenses
+    # Get monthly expenses - ensure we're getting ALL expenses from the start of the month
     monthly_expenses = Expense.query.filter(
         Expense.user_id == current_user.id,
         Expense.date >= month_start,
@@ -71,7 +71,7 @@ def dashboard():
     # Get recent expenses
     recent_expenses = Expense.query.filter_by(
         user_id=current_user.id
-    ).order_by(Expense.date.desc()).limit(5).all()    #.all() doesn't mean “get everything in the table” — it means “fetch all the results that match the query you've built up so far
+    ).order_by(Expense.date.desc()).limit(5).all()
     
     # Get active budgets
     active_budgets = Budget.query.filter(
@@ -80,12 +80,12 @@ def dashboard():
         Budget.end_date >= today
     ).all()
     
-    # Prepare budget data | Prepare budget data for chart
+    # Prepare budget data for chart
     budget_names = [budget.name for budget in active_budgets]
     budget_amounts = [float(budget.amount) for budget in active_budgets]
     spent_amounts = [budget.get_spent_amount() for budget in active_budgets]
     
-    # Get category expenses for the month
+    # Get category expenses for the month - ensure we're getting ALL expenses from the start of the month
     expenses_by_category = db.session.query(
         Category.name,
         db.func.sum(Expense.amount).label('total')
@@ -123,6 +123,11 @@ def dashboard():
         trend_dates.append(date_str)
         trend_amounts.append(amount)
         current_date += timedelta(days=1)
+    
+    # Debug prints - you can remove these after confirming it works
+    print(f"Month start: {month_start}, Month end: {month_end}")
+    print(f"Total expenses: {total_expenses}")
+    print(f"Category expenses: {expenses_by_category}")
     
     return render_template(
         'dashboard.html',
@@ -371,8 +376,3 @@ def category_delete(category_id):
         return redirect(url_for('category_list'))
     
     return render_template('category_confirm_delete.html', category=category)
-
-
-
-
-
