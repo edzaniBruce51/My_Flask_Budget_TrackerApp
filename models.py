@@ -1,4 +1,4 @@
-from flask_login import UserMixin # (UserMixin) pre-made security badge system
+from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
@@ -6,24 +6,18 @@ db = SQLAlchemy()
 # Stores user info (username, password)
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False) #unique=True : Like a username on social media - everyone needs a unique one
+    username = db.Column(db.String(80), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)  
     
     # Relationships
-    #Tells Flask: "Each user has their own category, expense, and budget folders
-    #backref='user': Each category can look up who owns it
-    #The lazy=True part means: "Don't load everything at once - wait until we actually need it" (saves memory and speed).
-    #relationship is there to connect users with their categories. Without this relationship, managing categories for different users would be much more complicated!
-    categories = db.relationship('Category', backref='user', lazy=True) 
-    expenses = db.relationship('Expense', backref='user', lazy=True)
-    budgets = db.relationship('Budget', backref='user', lazy=True)
+    categories = db.relationship('Category', back_populates='user', lazy=True)
+    expenses = db.relationship('Expense', back_populates='user', lazy=True)
+    budgets = db.relationship('Budget', back_populates='user', lazy=True)
     
-    #The __repr__ function is like creating a name tag for your objects.
     def __repr__(self):
-        return f'<User {self.username}>' # Shows for example: <User bruce>
+        return f'<User {self.username}>'
 
 # Stores expense categories (Food, Transport, etc.)
-# Connected to specific users (user_id)
 class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
@@ -31,12 +25,12 @@ class Category(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     
     # Relationships
-    # Change backref to a different name to avoid conflict
-    expenses = db.relationship('Expense', backref='category_ref', lazy=True)
-    budgets = db.relationship('Budget', backref='category', lazy=True)
+    user = db.relationship('User', back_populates='categories')
+    expenses = db.relationship('Expense', back_populates='category', lazy=True)
+    budgets = db.relationship('Budget', back_populates='category', lazy=True)
     
     def __repr__(self):
-        return f'<Category {self.name}>' #self refers to the specific category object being printed
+        return f'<Category {self.name}>'
     
     def get_total_expenses(self):
         """Returns the total expenses for this category"""
@@ -44,11 +38,10 @@ class Category(db.Model):
         result = db.session.query(func.sum(Expense.amount)).filter(
             Expense.category_id == self.id,
             Expense.user_id == self.user_id
-        ).scalar() #We just want one number (the sum of expenses) unlike .all() .scalar(): Returns a single value
+        ).scalar()
         return result or 0
 
 # Stores budget limits
-# Connected to categories and users
 class Budget(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -57,6 +50,10 @@ class Budget(db.Model):
     end_date = db.Column(db.Date, nullable=False)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    
+    # Relationships
+    user = db.relationship('User', back_populates='budgets')
+    category = db.relationship('Category', back_populates='budgets')
     
     def __repr__(self):
         return f'<Budget {self.name} ({self.start_date} to {self.end_date})>'
@@ -83,9 +80,7 @@ class Budget(db.Model):
             return (self.get_spent_amount() / amount) * 100
         return 0.0
 
-
 # Stores actual expenses
-# Connected to categories and users
 class Expense(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     amount = db.Column(db.Numeric(10, 2), nullable=False)
@@ -94,8 +89,21 @@ class Expense(db.Model):
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     
-    # Add the relationship to Category
-    category = db.relationship('Category', backref='expenses')
+    # Relationships
+    user = db.relationship('User', back_populates='expenses')
+    category = db.relationship('Category', back_populates='expenses')
     
     def __repr__(self):
         return f'<Expense {self.description} (${self.amount} on {self.date})>'
+
+
+
+
+
+
+
+
+
+
+
+
