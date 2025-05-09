@@ -31,7 +31,8 @@ class Category(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     
     # Relationships
-    expenses = db.relationship('Expense', backref='category', lazy=True)
+    # Change backref to a different name to avoid conflict
+    expenses = db.relationship('Expense', backref='category_ref', lazy=True)
     budgets = db.relationship('Budget', backref='category', lazy=True)
     
     def __repr__(self):
@@ -98,6 +99,5 @@ class Expense(db.Model):
     
     def __repr__(self):
         return f'<Expense {self.description} (${self.amount} on {self.date})>'
-
 
 
