@@ -158,7 +158,7 @@ def dashboard():
 @login_required
 def expense_list():
     expenses = Expense.query.filter_by(user_id=current_user.id).order_by(Expense.date.desc()).all()
-    return render_template('expense_list.html', expenses=expenses)
+    return render_template('expense_list.html', expenses=expenses, Category=Category)
 
 @app.route('/expenses/add', methods=['GET', 'POST'])
 @login_required
@@ -392,6 +392,8 @@ def category_delete(category_id):
         return redirect(url_for('category_list'))
     
     return render_template('category_confirm_delete.html', category=category)
+
+
 
 
 
