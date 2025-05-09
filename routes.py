@@ -52,11 +52,11 @@ def register():
 def dashboard():
     # Get current month's date range
     today = datetime.now()
-    month_start = today.replace(day=1)  # First day of current month
-    month_end = (month_start + timedelta(days=32)).replace(day=1) - timedelta(days=1)  # Last day of current month
+    month_start = today.replace(day=1, hour=0, minute=0, second=0, microsecond=0)  # First day of current month at midnight
+    month_end = (month_start + timedelta(days=32)).replace(day=1) - timedelta(seconds=1)  # Last day of current month at 23:59:59
     
-    # Get last 30 days for trend chart
-    thirty_days_ago = today - timedelta(days=30)
+    # Debug prints for date ranges
+    print(f"Month start: {month_start}, Month end: {month_end}")
     
     # Get monthly expenses - ensure we're getting ALL expenses from the start of the month
     monthly_expenses = Expense.query.filter(
@@ -65,8 +65,14 @@ def dashboard():
         Expense.date <= month_end
     ).all()
     
+    # Debug print each expense to verify they're being captured
+    print("Monthly expenses:")
+    for expense in monthly_expenses:
+        print(f"  - {expense.date}: {expense.description} - {expense.amount}")
+    
     # Calculate total expenses for the month
     total_expenses = sum(float(expense.amount) for expense in monthly_expenses)
+    print(f"Total expenses: {total_expenses}")
     
     # Get recent expenses
     recent_expenses = Expense.query.filter_by(
@@ -94,6 +100,11 @@ def dashboard():
         Expense.date >= month_start,
         Expense.date <= month_end
     ).group_by(Category.name).all()
+    
+    # Debug print category expenses
+    print("Category expenses:")
+    for category, amount in expenses_by_category:
+        print(f"  - {category}: {amount}")
     
     category_names = [item[0] for item in expenses_by_category]
     category_amounts = [float(item[1]) for item in expenses_by_category]
@@ -160,6 +171,9 @@ def expense_create():
     form.category.choices = [(c.id, c.name) for c in Category.query.filter_by(user_id=current_user.id).all()]
     
     if form.validate_on_submit():
+        # Debug print the date being submitted
+        print(f"Adding expense with date: {form.date.data}, type: {type(form.date.data)}")
+        
         expense = Expense(
             description=form.description.data,
             amount=form.amount.data,
@@ -169,6 +183,10 @@ def expense_create():
         )
         db.session.add(expense)
         db.session.commit()
+        
+        # Debug print the saved expense
+        print(f"Saved expense: {expense.id}, date: {expense.date}")
+        
         flash('Expense added successfully!', 'success')
         return redirect(url_for('expense_list'))
     
