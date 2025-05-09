@@ -89,13 +89,13 @@ class Budget(db.Model):
 class Expense(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     amount = db.Column(db.Numeric(10, 2), nullable=False)
-    date = db.Column(db.Date, nullable=False)  # This should be a Date type, not DateTime
+    date = db.Column(db.Date, nullable=False)
     description = db.Column(db.String(200), nullable=False)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     
-    # Add a relationship to Category to make it easier to access
-    category = db.relationship('Category', backref='expenses')
+    # Remove this explicit relationship since it's now handled by the backref
+    # category = db.relationship('Category', backref='expenses')
     
     def __repr__(self):
         return f'<Expense {self.description} (${self.amount} on {self.date})>'
