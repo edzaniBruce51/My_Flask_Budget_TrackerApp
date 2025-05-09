@@ -55,6 +55,9 @@ def dashboard():
     month_start = today.replace(day=1, hour=0, minute=0, second=0, microsecond=0)  # First day of current month at midnight
     month_end = (month_start + timedelta(days=32)).replace(day=1) - timedelta(seconds=1)  # Last day of current month at 23:59:59
     
+    # Get last 30 days for trend chart
+    thirty_days_ago = today - timedelta(days=30)
+    
     # Debug prints for date ranges
     print(f"Month start: {month_start}, Month end: {month_end}")
     
@@ -134,11 +137,6 @@ def dashboard():
         trend_dates.append(date_str)
         trend_amounts.append(amount)
         current_date += timedelta(days=1)
-    
-    # Debug prints - you can remove these after confirming it works
-    print(f"Month start: {month_start}, Month end: {month_end}")
-    print(f"Total expenses: {total_expenses}")
-    print(f"Category expenses: {expenses_by_category}")
     
     return render_template(
         'dashboard.html',
@@ -394,3 +392,12 @@ def category_delete(category_id):
         return redirect(url_for('category_list'))
     
     return render_template('category_confirm_delete.html', category=category)
+
+
+
+
+
+
+
+
+
