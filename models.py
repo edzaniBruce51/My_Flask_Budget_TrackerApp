@@ -94,10 +94,8 @@ class Expense(db.Model):
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     
-    # Remove this explicit relationship since it's now handled by the backref
-    # category = db.relationship('Category', backref='expenses')
+    # Add the relationship to Category
+    category = db.relationship('Category', backref='expenses')
     
     def __repr__(self):
         return f'<Expense {self.description} (${self.amount} on {self.date})>'
-
-
